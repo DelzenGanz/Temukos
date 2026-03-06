@@ -85,7 +85,9 @@
                     @forelse($recentBookings as $booking)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 text-gray-600">#{{ $booking->id }}</td>
-                        <td class="px-6 py-4 font-medium text-gray-800">{{ $booking->user->name }}</td>
+                        <td class="px-6 py-4 font-medium text-gray-800">
+                            {{ $booking->user ? $booking->user->name : 'Manual (Admin)' }}
+                        </td>
                         <td class="px-6 py-4 text-gray-600">{{ $booking->property->name }}</td>
                         <td class="px-6 py-4 font-semibold text-gray-800">{{ $booking->formattedTotalPrice() }}</td>
                         <td class="px-6 py-4">

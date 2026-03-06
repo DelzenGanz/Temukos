@@ -3,16 +3,16 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Pemesanan Saya</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Pemesanan Saya</h1>
     </div>
 
     @if($bookings->count())
     <div class="space-y-4">
         @foreach($bookings as $booking)
-        <div class="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 hover:shadow-md transition-shadow">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-5 sm:p-6 hover:shadow-md transition-shadow">
             <div class="flex flex-col sm:flex-row gap-4">
                 {{-- Property Photo --}}
-                <div class="w-full sm:w-32 h-24 sm:h-24 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                <div class="w-full sm:w-32 h-24 sm:h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 shrink-0">
                     @if($booking->property->primaryPhoto)
                         <img src="{{ $booking->property->primaryPhoto->url }}"
                              alt="{{ $booking->property->name }}"
@@ -31,7 +31,7 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <h3 class="font-semibold text-gray-800 truncate">
+                            <h3 class="font-semibold text-gray-800 dark:text-gray-200 truncate">
                                 <a href="{{ route('property.show', $booking->property) }}" class="hover:text-emerald-600 transition-colors">
                                     {{ $booking->property->name }}
                                 </a>
@@ -40,12 +40,12 @@
                         </div>
                         {{-- Status Badge --}}
                         <span class="shrink-0 px-3 py-1 text-xs font-semibold rounded-lg
-                            {{ $booking->isPaid() ? 'bg-emerald-100 text-emerald-700' : ($booking->isPending() ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
+                            {{ $booking->isPaid() ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : ($booking->isPending() ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400') }}">
                             {{ $booking->isPaid() ? 'Dibayar' : ($booking->isPending() ? 'Menunggu' : 'Dibatalkan') }}
                         </span>
                     </div>
 
-                    <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
+                    <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500 dark:text-gray-400">
                         <span class="flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -53,7 +53,7 @@
                             {{ $booking->start_date->format('d M Y') }}
                         </span>
                         <span>{{ $booking->duration_months }} bulan</span>
-                        <span class="font-semibold text-gray-700">{{ $booking->formattedTotalPrice() }}</span>
+                        <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $booking->formattedTotalPrice() }}</span>
                     </div>
 
                     {{-- Pay Now Button --}}
@@ -84,8 +84,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-1">Belum ada pemesanan</h3>
-        <p class="text-sm text-gray-400 mb-4">Anda belum melakukan pemesanan. Mulai cari properti impian Anda!</p>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">Belum ada pemesanan</h3>
+        <p class="text-sm text-gray-400 dark:text-gray-500 mb-4">Anda belum melakukan pemesanan. Mulai cari properti impian Anda!</p>
         <a href="{{ route('home') }}" class="inline-block px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all text-sm">
             Cari Properti
         </a>
