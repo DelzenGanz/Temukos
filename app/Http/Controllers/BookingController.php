@@ -39,6 +39,13 @@ class BookingController extends Controller
             'duration_months' => 'required|integer|min:1|max:12',
         ]);
 
+        if (!$property->isAvailableBetween($validated['start_date'], $validated['duration_months'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Properti ini tidak tersedia pada rentang tanggal yang Anda pilih.',
+            ], 422);
+        }
+
         $totalPrice = $property->price_month * $validated['duration_months'];
 
         $booking = Booking::create([

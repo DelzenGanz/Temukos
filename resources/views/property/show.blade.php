@@ -112,6 +112,26 @@
                 {{-- Booking Form --}}
                 <div id="booking-form-section">
                     <div class="space-y-4">
+                        {{-- Booked Dates Info --}}
+                        @if($bookedRanges->count() > 0)
+                        <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                            <h3 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Jadwal Terisi
+                            </h3>
+                            <ul class="space-y-1">
+                                @foreach($bookedRanges as $range)
+                                <li class="text-xs text-amber-700 flex items-center gap-2">
+                                    <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+                                    {{ \Carbon\Carbon::parse($range['start'])->format('d M Y') }} - {{ \Carbon\Carbon::parse($range['end'])->format('d M Y') }}
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+
                         <div>
                             <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Mulai</label>
                             <input type="date"
@@ -209,6 +229,25 @@
     }
 
     // Booking Submission
+    const bookedRanges = @json($bookedRanges);
+
+    function isOverlapping(startStr, durationMonths) {
+        const selectedStart = new Date(startStr);
+        const selectedEnd = new Date(startStr);
+        selectedEnd.setMonth(selectedEnd.getMonth() + parseInt(durationMonths));
+
+        for (const range of bookedRanges) {
+            const rangeStart = new Date(range.start);
+            const rangeEnd = new Date(range.end);
+
+            // A overlaps B if (A.start < B.end) AND (A.end > B.start)
+            if (selectedStart < rangeEnd && selectedEnd > rangeStart) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function submitBooking() {
         const startDate = document.getElementById('start_date').value;
         const duration = document.getElementById('duration_months').value;
@@ -216,6 +255,11 @@
 
         if (!startDate) {
             alert('Silakan pilih tanggal mulai sewa.');
+            return;
+        }
+
+        if (isOverlapping(startDate, duration)) {
+            alert('Properti ini tidak tersedia pada rentang tanggal yang Anda pilih. Silakan periksa "Jadwal Terisi" di atas.');
             return;
         }
 
