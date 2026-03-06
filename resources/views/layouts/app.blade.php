@@ -17,48 +17,65 @@
     {{-- Midtrans Snap JS (only loaded when needed) --}}
     @stack('scripts-head')
 
+    {{-- Dark Mode Init (Prevents FOUC) --}}
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     <style>
         * { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-[#FAF9F6] text-gray-800 min-h-screen flex flex-col antialiased">
+<body class="bg-[#FAF9F6] text-gray-800 dark:bg-slate-950 dark:text-slate-200 min-h-screen flex flex-col antialiased transition-colors duration-500">
 
     {{-- Navbar --}}
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+    <nav class="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 {{-- Brand --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-2 group">
                     <img src="{{ asset('Images/logo.png') }}" alt="Temukos Logo" class="h-8 w-auto drop-shadow-sm">
-                    <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Temukos</span>
+                    <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">Temukos</span>
                 </a>
 
                 {{-- Nav Links --}}
                 <div class="flex items-center gap-3">
                     {{-- Section Links for Homepage --}}
                     @if(request()->routeIs('home'))
-                        <div class="hidden md:flex items-center gap-1 mr-4 border-r border-gray-200 pr-4">
-                            <a href="#about" class="text-sm font-medium text-gray-600 hover:text-teal-600 px-3 py-2 rounded-lg transition-colors">Tentang</a>
-                            <a href="#properties" class="text-sm font-medium text-gray-600 hover:text-teal-600 px-3 py-2 rounded-lg transition-colors">Properti</a>
-                            <a href="#how-to-book" class="text-sm font-medium text-gray-600 hover:text-teal-600 px-3 py-2 rounded-lg transition-colors">Cara Pesan</a>
+                        <div class="hidden md:flex items-center gap-1 mr-4 border-r border-gray-200 dark:border-slate-700 pr-4 transition-colors">
+                            <a href="#about" class="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 rounded-lg transition-colors">Tentang</a>
+                            <a href="#properties" class="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 rounded-lg transition-colors">Properti</a>
+                            <a href="#how-to-book" class="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 rounded-lg transition-colors">Cara Pesan</a>
                         </div>
                     @else
-                        <div class="hidden md:flex items-center gap-1 mr-4 border-r border-gray-200 pr-4">
-                            <a href="{{ route('home') }}#about" class="text-sm font-medium text-gray-600 hover:text-teal-600 px-3 py-2 rounded-lg transition-colors">Tentang</a>
-                            <a href="{{ route('home') }}#properties" class="text-sm font-medium text-gray-600 hover:text-teal-600 px-3 py-2 rounded-lg transition-colors">Properti</a>
-                            <a href="{{ route('home') }}#how-to-book" class="text-sm font-medium text-gray-600 hover:text-teal-600 px-3 py-2 rounded-lg transition-colors">Cara Pesan</a>
+                        <div class="hidden md:flex items-center gap-1 mr-4 border-r border-gray-200 dark:border-slate-700 pr-4 transition-colors">
+                            <a href="{{ route('home') }}#about" class="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 rounded-lg transition-colors">Tentang</a>
+                            <a href="{{ route('home') }}#properties" class="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 rounded-lg transition-colors">Properti</a>
+                            <a href="{{ route('home') }}#how-to-book" class="text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-2 rounded-lg transition-colors">Cara Pesan</a>
                         </div>
                     @endif
 
+                    {{-- Theme Toggle Button --}}
+                    <button id="theme-toggle" type="button" class="text-gray-500 hover:text-teal-600 dark:text-slate-400 dark:hover:text-teal-400 focus:outline-none rounded-full text-sm p-2 transition-all relative w-10 h-10 flex items-center justify-center overflow-hidden hover:bg-gray-100 dark:hover:bg-slate-800 mr-2">
+                        {{-- Sun Icon (for Dark Mode) --}}
+                        <svg id="theme-toggle-light-icon" class="w-5 h-5 absolute hidden dark:block text-teal-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                        {{-- Moon Icon (for Light Mode) --}}
+                        <svg id="theme-toggle-dark-icon" class="w-5 h-5 absolute block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    </button>
+
                     @auth
-                        <a href="{{ route('bookings.index') }}" class="text-sm text-gray-600 hover:text-teal-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-teal-50">
+                        <a href="{{ route('bookings.index') }}" class="text-sm text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/30">
                             Pemesanan Saya
                         </a>
-                        <div class="flex items-center gap-2 pl-3 border-l border-gray-200">
-                            <div class="w-8 h-8 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-full flex items-center justify-center">
-                                <span class="text-sm font-semibold text-teal-700">{{ substr(Auth::user()->name, 0, 1) }}</span>
+                        <div class="flex items-center gap-2 pl-3 border-l border-gray-200 dark:border-slate-700 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-800 dark:to-cyan-800 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-semibold text-teal-700 dark:text-teal-200">{{ substr(Auth::user()->name, 0, 1) }}</span>
                             </div>
-                            <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ Auth::user()->name }}</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-slate-200 hidden sm:block">{{ Auth::user()->name }}</span>
                             <form action="{{ route('logout') }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-sm text-gray-400 hover:text-red-500 transition-colors ml-1" title="Logout">
@@ -69,10 +86,10 @@
                             </form>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-teal-600 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-teal-50">
+                        <a href="{{ route('login') }}" class="text-sm text-gray-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/30">
                             Masuk
                         </a>
-                        <a href="{{ route('register') }}" class="text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-cyan-600 px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-teal-200 transition-all duration-300">
+                        <a href="{{ route('register') }}" class="text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-cyan-600 dark:from-teal-600 dark:to-cyan-700 px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-teal-200 dark:hover:shadow-teal-900/50 transition-all duration-300">
                             Daftar
                         </a>
                     @endauth
@@ -236,6 +253,31 @@
             const flash = document.getElementById('flash-success');
             if (flash) flash.style.display = 'none';
         }, 4000);
+    </script>
+
+    {{-- Dark Mode Toggle Logic --}}
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function() {
+            if (localStorage.getItem('theme')) {
+                if (localStorage.getItem('theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+        });
     </script>
 
     @stack('scripts')
