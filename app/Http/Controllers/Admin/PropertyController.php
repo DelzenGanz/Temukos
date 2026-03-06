@@ -30,8 +30,8 @@ class PropertyController extends Controller
 
     public function create()
     {
-        $facilities = Facility::orderBy('name')->get();
-        return view('admin.properties.create', compact('facilities'));
+        $facilitiesByType = Facility::orderBy('name')->get()->groupBy('property_type');
+        return view('admin.properties.create', compact('facilitiesByType'));
     }
 
     public function store(Request $request)
@@ -51,16 +51,20 @@ class PropertyController extends Controller
 
         $property = Property::create($validated);
 
-        // Attach facilities
-        if ($request->has('facilities')) {
-            $property->facilities()->attach($request->input('facilities'));
+        $facilityIds = Facility::query()
+            ->forPropertyType($validated['property_type'])
+            ->whereIn('id', $request->input('facilities', []))
+            ->pluck('id');
+
+        if ($facilityIds->isNotEmpty()) {
+            $property->facilities()->attach($facilityIds);
         }
 
         // Upload photos
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $index => $photo) {
                 $filename = 'property-' . $property->id . '-' . time() . '-' . $index . '.' . $photo->getClientOriginalExtension();
-                $photo->storeAs('public/uploads', $filename);
+                $photo->storeAs('uploads', $filename, 'public');
 
                 PropertyPhoto::create([
                     'property_id' => $property->id,
@@ -76,8 +80,8 @@ class PropertyController extends Controller
     public function edit(Property $property)
     {
         $property->load(['photos', 'facilities']);
-        $facilities = Facility::orderBy('name')->get();
-        return view('admin.properties.edit', compact('property', 'facilities'));
+        $facilitiesByType = Facility::orderBy('name')->get()->groupBy('property_type');
+        return view('admin.properties.edit', compact('property', 'facilitiesByType'));
     }
 
     public function update(Request $request, Property $property)
@@ -98,14 +102,18 @@ class PropertyController extends Controller
 
         $property->update($validated);
 
-        // Sync facilities
-        $property->facilities()->sync($request->input('facilities', []));
+        $facilityIds = Facility::query()
+            ->forPropertyType($validated['property_type'])
+            ->whereIn('id', $request->input('facilities', []))
+            ->pluck('id');
+
+        $property->facilities()->sync($facilityIds);
 
         // Upload new photos
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $index => $photo) {
                 $filename = 'property-' . $property->id . '-' . time() . '-' . $index . '.' . $photo->getClientOriginalExtension();
-                $photo->storeAs('public/uploads', $filename);
+                $photo->storeAs('uploads', $filename, 'public');
 
                 PropertyPhoto::create([
                     'property_id' => $property->id,
@@ -128,7 +136,7 @@ class PropertyController extends Controller
     {
         // Delete photo files
         foreach ($property->photos as $photo) {
-            Storage::delete('public/uploads/' . $photo->filename);
+            Storage::disk('public')->delete('uploads/' . $photo->filename);
         }
 
         $property->delete();
@@ -138,7 +146,7 @@ class PropertyController extends Controller
 
     public function deletePhoto(PropertyPhoto $photo)
     {
-        Storage::delete('public/uploads/' . $photo->filename);
+        Storage::disk('public')->delete('uploads/' . $photo->filename);
         $photo->delete();
 
         return back()->with('success', 'Foto berhasil dihapus.');

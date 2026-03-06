@@ -67,15 +67,23 @@
             {{-- Facilities --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Fasilitas</label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    @foreach($facilities as $facility)
-                    <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-100 cursor-pointer hover:border-emerald-200 transition-all">
-                        <input type="checkbox" name="facilities[]" value="{{ $facility->id }}"
-                               {{ in_array($facility->id, old('facilities', [])) ? 'checked' : '' }}
-                               class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
-                        <span class="text-xs text-gray-700">{{ $facility->name }}</span>
-                    </label>
+                <p class="text-xs text-gray-400 mb-3">Pilih tipe properti terlebih dahulu agar fasilitas yang sesuai muncul otomatis.</p>
+                <div id="facility-groups">
+                    @foreach($facilitiesByType as $type => $typeFacilities)
+                    <div data-facility-group="{{ $type }}" class="grid grid-cols-2 sm:grid-cols-3 gap-2 {{ old('property_type') === $type ? '' : 'hidden' }}">
+                        @foreach($typeFacilities as $facility)
+                        <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-100 cursor-pointer hover:border-emerald-200 transition-all">
+                            <input type="checkbox" name="facilities[]" value="{{ $facility->id }}"
+                                   {{ in_array($facility->id, old('facilities', [])) ? 'checked' : '' }}
+                                   class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            <span class="text-xs text-gray-700">{{ $facility->name }}</span>
+                        </label>
+                        @endforeach
+                    </div>
                     @endforeach
+                    <div id="facility-placeholder" class="rounded-xl border border-dashed border-gray-200 px-4 py-5 text-sm text-gray-400 {{ old('property_type') ? 'hidden' : '' }}">
+                        Belum ada tipe properti yang dipilih.
+                    </div>
                 </div>
             </div>
 
@@ -99,4 +107,31 @@
         </form>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeSelect = document.getElementById('property_type');
+        const groups = document.querySelectorAll('[data-facility-group]');
+        const placeholder = document.getElementById('facility-placeholder');
+
+        function syncFacilities() {
+            const selectedType = typeSelect.value;
+
+            groups.forEach((group) => {
+                const isActive = group.dataset.facilityGroup === selectedType;
+                group.classList.toggle('hidden', !isActive);
+
+                group.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    if (!isActive) {
+                        input.checked = false;
+                    }
+                });
+            });
+
+            placeholder.classList.toggle('hidden', Boolean(selectedType));
+        }
+
+        typeSelect.addEventListener('change', syncFacilities);
+        syncFacilities();
+    });
+</script>
 @endsection

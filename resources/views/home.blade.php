@@ -426,10 +426,10 @@
                     <h3 class="text-base font-black text-gray-900 dark:text-white uppercase tracking-widest mb-5">Tipe Properti</h3>
                     <div class="grid grid-cols-3 gap-4">
                         @foreach(['kos' => 'Kos', 'kontrakan' => 'Kontrakan', 'apartemen' => 'Apartemen'] as $value => $label)
-                        <label class="flex flex-col items-center justify-center gap-2 h-20 rounded-2xl border-2 cursor-pointer transition-all text-center relative
-                            {{ in_array($value, request('type', [])) ? 'border-teal-500 dark:border-teal-400 bg-teal-50/50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400' : 'border-gray-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/50 text-gray-500 dark:text-slate-400' }}">
-                            <input type="checkbox" name="type[]" value="{{ $value }}" {{ in_array($value, request('type', [])) ? 'checked' : '' }}
-                                   class="absolute opacity-0 w-0 h-0">
+                        <label data-type-card class="flex flex-col items-center justify-center gap-2 h-20 rounded-2xl border-2 cursor-pointer transition-all text-center relative
+                            {{ $selectedType === $value ? 'border-teal-500 dark:border-teal-400 bg-teal-50/50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400' : 'border-gray-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/50 text-gray-500 dark:text-slate-400' }}">
+                            <input type="radio" name="type" value="{{ $value }}" {{ $selectedType === $value ? 'checked' : '' }}
+                                   class="absolute opacity-0 w-0 h-0 filter-type-input">
                             <span class="text-sm font-bold">{{ $label }}</span>
                         </label>
                         @endforeach
@@ -456,15 +456,23 @@
                 {{-- Facilities --}}
                 <div>
                     <h3 class="text-base font-black text-gray-900 dark:text-white uppercase tracking-widest mb-5">Fasilitas Termasuk</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach($facilities as $facility)
-                        <label class="flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 cursor-pointer transition-all
-                            {{ in_array($facility->id, request('facilities', [])) ? 'border-teal-500 dark:border-teal-400 bg-teal-50/50 dark:bg-teal-900/20' : 'border-gray-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/50' }}">
-                            <input type="checkbox" name="facilities[]" value="{{ $facility->id }}" {{ in_array($facility->id, request('facilities', [])) ? 'checked' : '' }}
-                                   class="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 border-gray-300 dark:border-slate-600 dark:bg-slate-800">
-                            <span class="text-sm font-bold text-gray-700 dark:text-slate-200">{{ $facility->name }}</span>
-                        </label>
+                    <p class="text-sm text-gray-500 dark:text-slate-400 mb-4">Pilih satu tipe properti untuk melihat fasilitas yang sesuai.</p>
+                    <div id="home-facility-groups">
+                        @foreach($facilitiesByType as $type => $typeFacilities)
+                        <div data-home-facility-group="{{ $type }}" class="grid grid-cols-2 gap-4 {{ $selectedType === $type ? '' : 'hidden' }}">
+                            @foreach($typeFacilities as $facility)
+                            <label class="flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 cursor-pointer transition-all
+                                {{ in_array($facility->id, request('facilities', [])) ? 'border-teal-500 dark:border-teal-400 bg-teal-50/50 dark:bg-teal-900/20' : 'border-gray-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/50' }}">
+                                <input type="checkbox" name="facilities[]" value="{{ $facility->id }}" {{ in_array($facility->id, request('facilities', [])) ? 'checked' : '' }}
+                                       class="w-5 h-5 text-teal-600 rounded focus:ring-teal-500 border-gray-300 dark:border-slate-600 dark:bg-slate-800">
+                                <span class="text-sm font-bold text-gray-700 dark:text-slate-200">{{ $facility->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
                         @endforeach
+                        <div id="home-facility-placeholder" class="rounded-2xl border-2 border-dashed border-gray-100 dark:border-slate-700 px-4 py-5 text-sm font-medium text-gray-400 dark:text-slate-500 {{ $selectedType ? 'hidden' : '' }}">
+                            Belum ada tipe properti yang dipilih.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -477,4 +485,96 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Format number with thousand separators (dots for Indonesian format)
+    function formatRupiah(value) {
+        return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function initPriceInput(displayId, hiddenName) {
+        const input = document.querySelector(`input[name="${hiddenName}"]`);
+        if (!input) return;
+
+        // Create a display input
+        const display = document.createElement('input');
+        display.type = 'text';
+        display.placeholder = input.placeholder;
+        display.className = input.className;
+        display.id = displayId;
+
+        // Pre-fill if value exists
+        if (input.value) {
+            display.value = formatRupiah(input.value);
+        }
+
+        // Hide the real input
+        input.type = 'hidden';
+        input.parentNode.insertBefore(display, input);
+
+        // Format on input
+        display.addEventListener('input', function () {
+            const raw = this.value.replace(/\./g, '');
+            this.value = formatRupiah(this.value);
+            input.value = raw; // submit raw number to backend
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initPriceInput('display_price_min', 'price_min');
+        initPriceInput('display_price_max', 'price_max');
+
+        const typeInputs = document.querySelectorAll('.filter-type-input');
+        const typeCards = document.querySelectorAll('[data-type-card]');
+        const facilityGroups = document.querySelectorAll('[data-home-facility-group]');
+        const facilityPlaceholder = document.getElementById('home-facility-placeholder');
+
+        function syncHomeFacilities() {
+            const selectedTypeInput = document.querySelector('.filter-type-input:checked');
+            const selectedType = selectedTypeInput ? selectedTypeInput.value : '';
+
+            typeCards.forEach((card) => {
+                const input = card.querySelector('.filter-type-input');
+                const isActive = input && input.checked;
+
+                card.classList.toggle('border-teal-500', isActive);
+                card.classList.toggle('dark:border-teal-400', isActive);
+                card.classList.toggle('bg-teal-50/50', isActive);
+                card.classList.toggle('dark:bg-teal-900/20', isActive);
+                card.classList.toggle('text-teal-700', isActive);
+                card.classList.toggle('dark:text-teal-400', isActive);
+
+                card.classList.toggle('border-gray-100', !isActive);
+                card.classList.toggle('dark:border-slate-700', !isActive);
+                card.classList.toggle('hover:border-teal-200', !isActive);
+                card.classList.toggle('dark:hover:border-teal-500/50', !isActive);
+                card.classList.toggle('text-gray-500', !isActive);
+                card.classList.toggle('dark:text-slate-400', !isActive);
+            });
+
+            facilityGroups.forEach((group) => {
+                const isActive = group.dataset.homeFacilityGroup === selectedType;
+                group.classList.toggle('hidden', !isActive);
+
+                group.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    if (!isActive) {
+                        input.checked = false;
+                    }
+                });
+            });
+
+            if (facilityPlaceholder) {
+                facilityPlaceholder.classList.toggle('hidden', Boolean(selectedType));
+            }
+        }
+
+        typeInputs.forEach((input) => {
+            input.addEventListener('change', syncHomeFacilities);
+        });
+
+        syncHomeFacilities();
+    });
+</script>
+@endpush
 @endsection

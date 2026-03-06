@@ -10,13 +10,19 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
+        $selectedType = $request->input('type');
+
+        if (is_array($selectedType)) {
+            $selectedType = $selectedType[0] ?? null;
+        }
+
         $query = Property::with(['primaryPhoto', 'facilities']);
 
         // Search by location keyword
         $query->filterByLocation($request->input('search'));
 
-        // Filter by property type (array of checkboxes)
-        $query->filterByType($request->input('type', []));
+        // Filter by property type
+        $query->filterByType($selectedType);
 
         // Filter by price range
         $query->filterByPrice($request->input('price_min'), $request->input('price_max'));
@@ -34,9 +40,16 @@ class HomeController extends Controller
         };
 
         $properties = $query->paginate(12)->withQueryString();
-        $facilities = Facility::orderBy('name')->get();
+        $facilities = Facility::query()
+            ->forPropertyType($selectedType)
+            ->orderBy('name')
+            ->get();
+        $facilitiesByType = Facility::query()
+            ->orderBy('name')
+            ->get()
+            ->groupBy('property_type');
         $totalResults = $properties->total();
 
-        return view('home', compact('properties', 'facilities', 'totalResults'));
+        return view('home', compact('properties', 'facilities', 'facilitiesByType', 'totalResults', 'selectedType'));
     }
 }

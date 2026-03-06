@@ -50,8 +50,10 @@ class Property extends Model
 
     // ── Scopes ──
 
-    public function scopeFilterByType($query, array $types)
+    public function scopeFilterByType($query, string|array|null $types)
     {
+        $types = array_values(array_filter((array) $types));
+
         if (!empty($types)) {
             $query->whereIn('property_type', $types);
         }

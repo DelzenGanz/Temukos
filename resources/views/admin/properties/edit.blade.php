@@ -66,15 +66,22 @@
             {{-- Facilities --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Fasilitas</label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    @foreach($facilities as $facility)
-                    <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-100 cursor-pointer hover:border-emerald-200 transition-all
-                        {{ $property->facilities->contains($facility->id) ? 'border-emerald-300 bg-emerald-50' : '' }}">
-                        <input type="checkbox" name="facilities[]" value="{{ $facility->id }}"
-                               {{ (collect(old('facilities', $property->facilities->pluck('id')->toArray()))->contains($facility->id)) ? 'checked' : '' }}
-                               class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
-                        <span class="text-xs text-gray-700">{{ $facility->name }}</span>
-                    </label>
+                <p class="text-xs text-gray-400 mb-3">Fasilitas akan menyesuaikan otomatis dengan tipe properti yang dipilih.</p>
+                <div id="facility-groups">
+                    @php($selectedType = old('property_type', $property->property_type))
+                    @php($selectedFacilities = collect(old('facilities', $property->facilities->pluck('id')->toArray())))
+                    @foreach($facilitiesByType as $type => $typeFacilities)
+                    <div data-facility-group="{{ $type }}" class="grid grid-cols-2 sm:grid-cols-3 gap-2 {{ $selectedType === $type ? '' : 'hidden' }}">
+                        @foreach($typeFacilities as $facility)
+                        <label class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-gray-100 cursor-pointer hover:border-emerald-200 transition-all
+                            {{ $selectedFacilities->contains($facility->id) ? 'border-emerald-300 bg-emerald-50' : '' }}">
+                            <input type="checkbox" name="facilities[]" value="{{ $facility->id }}"
+                                   {{ $selectedFacilities->contains($facility->id) ? 'checked' : '' }}
+                                   class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            <span class="text-xs text-gray-700">{{ $facility->name }}</span>
+                        </label>
+                        @endforeach
+                    </div>
                     @endforeach
                 </div>
             </div>
@@ -129,4 +136,28 @@
         </form>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeSelect = document.getElementById('property_type');
+        const groups = document.querySelectorAll('[data-facility-group]');
+
+        function syncFacilities() {
+            const selectedType = typeSelect.value;
+
+            groups.forEach((group) => {
+                const isActive = group.dataset.facilityGroup === selectedType;
+                group.classList.toggle('hidden', !isActive);
+
+                group.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+                    if (!isActive) {
+                        input.checked = false;
+                    }
+                });
+            });
+        }
+
+        typeSelect.addEventListener('change', syncFacilities);
+        syncFacilities();
+    });
+</script>
 @endsection

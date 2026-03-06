@@ -9,19 +9,41 @@ class FacilitySeeder extends Seeder
 {
     public function run(): void
     {
-        $facilities = [
-            'AC',
-            'WiFi',
-            'Kamar mandi dalam',
-            'Dapur bersama',
-            'Parkir motor',
-            'Parkir mobil',
-            'Laundry',
-            'Security 24 jam',
+        $facilitiesByType = [
+            'kos' => [
+                'AC',
+                'WiFi',
+                'Kamar mandi dalam',
+                'Dapur bersama',
+                'Laundry',
+                'Security 24 jam',
+            ],
+            'kontrakan' => [
+                'Garasi',
+                'Ruang tamu',
+                'Dapur pribadi',
+                'Kamar mandi',
+                'Halaman',
+                'Parkir mobil',
+            ],
+            'apartemen' => [
+                'AC',
+                'WiFi',
+                'Kitchen set',
+                'Lift',
+                'Kolam renang',
+                'Gym',
+                'Security 24 jam',
+            ],
         ];
 
-        foreach ($facilities as $name) {
-            Facility::create(['name' => $name]);
+        foreach ($facilitiesByType as $propertyType => $facilities) {
+            foreach ($facilities as $name) {
+                Facility::firstOrCreate([
+                    'name' => $name,
+                    'property_type' => $propertyType,
+                ]);
+            }
         }
     }
 }
