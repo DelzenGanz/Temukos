@@ -48,6 +48,14 @@
                     @error('address')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
+                <div class="sm:col-span-2">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">Nomor WhatsApp Pemilik</label>
+                    <input type="text" name="phone" id="phone" value="{{ old('phone', $property->phone) }}" placeholder="Contoh: 6282146008889"
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 @error('phone') border-red-300 @enderror">
+                    <p class="text-[10px] text-gray-400 mt-1">Gunakan kode negara (62) tanpa tanda + atau spasi.</p>
+                    @error('phone')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
                 <div>
                     <label for="price_month" class="block text-sm font-medium text-gray-700 mb-1.5">Harga per Bulan (Rp)</label>
                     <input type="number" name="price_month" id="price_month" value="{{ old('price_month', $property->price_month) }}" required min="0"
@@ -103,10 +111,11 @@
                                     {{ $photo->is_primary ? '★ Utama' : 'Jadikan Utama' }}
                                 </span>
                             </label>
-                            <form action="{{ route('admin.properties.photo.delete', $photo) }}" method="POST" class="inline" onsubmit="return confirm('Hapus foto ini?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="px-2 py-1 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">×</button>
-                            </form>
+                            <button type="button" 
+                                    onclick="deletePhoto({{ $photo->id }})"
+                                    class="px-2 py-1 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                                ×
+                            </button>
                         </div>
                         @if($photo->is_primary)
                         <span class="absolute top-1 left-1 px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded">Utama</span>
@@ -136,6 +145,11 @@
         </form>
     </div>
 </div>
+
+{{-- Hidden form for photo deletion --}}
+<form id="delete-photo-form" method="POST" class="hidden">
+    @csrf @method('DELETE')
+</form>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const typeSelect = document.getElementById('property_type');
@@ -159,5 +173,13 @@
         typeSelect.addEventListener('change', syncFacilities);
         syncFacilities();
     });
+
+    function deletePhoto(photoId) {
+        if (confirm('Hapus foto ini?')) {
+            const form = document.getElementById('delete-photo-form');
+            form.action = `/admin/properties/photo/${photoId}`;
+            form.submit();
+        }
+    }
 </script>
 @endsection

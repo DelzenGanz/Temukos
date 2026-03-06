@@ -16,6 +16,7 @@ class Booking extends Model
         'status',
         'midtrans_order_id',
         'snap_token',
+        'notes',
     ];
 
     protected function casts(): array

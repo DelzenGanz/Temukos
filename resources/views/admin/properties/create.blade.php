@@ -48,6 +48,14 @@
                            class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 @error('address') border-red-300 @enderror">
                     @error('address')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
+                
+                <div class="sm:col-span-2">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">Nomor WhatsApp Pemilik</label>
+                    <input type="text" name="phone" id="phone" value="{{ old('phone') }}" placeholder="Contoh: 6282146008889"
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-emerald-300 focus:border-emerald-300 @error('phone') border-red-300 @enderror">
+                    <p class="text-[10px] text-gray-400 mt-1">Gunakan kode negara (62) tanpa tanda + atau spasi.</p>
+                    @error('phone')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
 
                 <div>
                     <label for="price_month" class="block text-sm font-medium text-gray-700 mb-1.5">Harga per Bulan (Rp)</label>

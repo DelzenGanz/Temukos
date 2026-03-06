@@ -93,5 +93,7 @@ Route::prefix('admin')->middleware(\App\Http\Middleware\AdminAuth::class)->group
 
     // Bookings Management
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings.index');
+    Route::get('/bookings/create', [AdminBookingController::class, 'create'])->name('admin.bookings.create');
+    Route::post('/bookings', [AdminBookingController::class, 'store'])->name('admin.bookings.store');
     Route::patch('/bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('admin.bookings.updateStatus');
 });

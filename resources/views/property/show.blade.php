@@ -162,6 +162,23 @@
                                 class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-emerald-200 transition-all duration-300 text-sm">
                             Pesan Sekarang
                         </button>
+
+                        @if($property->phone)
+                        <div class="relative flex items-center gap-3 py-2">
+                            <div class="flex-grow h-px bg-gray-100"></div>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Atau</span>
+                            <div class="flex-grow h-px bg-gray-100"></div>
+                        </div>
+
+                        <a href="https://wa.me/{{ $property->phone }}?text={{ urlencode('Halo, saya tertarik dengan properti ' . $property->name . ' yang saya lihat di Temukos.') }}"
+                           target="_blank"
+                           class="w-full py-3.5 bg-white border-2 border-emerald-500 text-emerald-600 font-semibold rounded-xl hover:bg-emerald-50 transition-all duration-300 text-sm text-center flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.224-3.92c1.516.903 3.125 1.38 4.772 1.382 5.227 0 9.482-4.255 9.485-9.483.002-2.533-.986-4.913-2.783-6.712s-4.18-2.787-6.711-2.789c-5.23 0-9.483 4.253-9.485 9.481-.001 1.67.437 3.3 1.27 4.73l-1.027 3.748 3.843-1.007zm10.375-6.522c-.297-.15-.1.45 1.76-2.53-.1.45-1.76-2.53l-.297-.15c-.297-.15-1.758-.867-2.055-1.016-.297-.15-.513-.225-.729.15-.216.375-.838 1.05-.1.45-1.76-2.53l.297-.15c-.297-.15-.513-.225-.729.15-.216.375-.838 1.05-1.026 1.275-.189.225-.378.254-.675.105-.297-.15-1.256-.463-2.39-1.475-.883-.788-1.48-1.76-1.653-2.059-.173-.299-.018-.46.13-.609.135-.134.298-.345.447-.517.148-.172.197-.294.297-.49.098-.196.049-.368-.025-.517-.073-.148-.655-1.577-.899-2.164-.237-.57-.478-.493-.655-.502-.17-.009-.364-.01-.559-.01-.195 0-.513.073-.782.368-.269.294-1.026 1.003-1.026 2.447 0 1.444 1.05 2.84 1.197 3.037.147.197 2.067 3.155 5.008 4.426.699.302 1.246.483 1.671.618.704.223 1.345.192 1.851.117.565-.084 1.758-.72 2.008-1.416.25-.697.25-1.294.175-1.417-.075-.123-.275-.196-.572-.346z"/>
+                            </svg>
+                            Hubungi Pemilik
+                        </a>
+                        @endif
                     </div>
                 </div>
                 @else

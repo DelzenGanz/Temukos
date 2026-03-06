@@ -2,7 +2,15 @@
 
 @section('content')
 <div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-800">Kelola Pemesanan</h1>
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-800">Kelola Pemesanan</h1>
+        <a href="{{ route('admin.bookings.create') }}" class="px-5 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+            Tambah Pemesanan Manual
+        </a>
+    </div>
 
     {{-- Filters --}}
     <div class="flex flex-wrap gap-3">
@@ -47,10 +55,17 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 text-gray-600">#{{ $booking->id }}</td>
                         <td class="px-6 py-4">
+                            @if($booking->user)
                             <div>
                                 <p class="font-medium text-gray-800">{{ $booking->user->name }}</p>
                                 <p class="text-xs text-gray-400">{{ $booking->user->email }}</p>
                             </div>
+                            @else
+                            <div>
+                                <p class="font-medium text-gray-500 italic">Pemesanan Manual</p>
+                                <p class="text-xs text-gray-400">Terinput oleh Admin</p>
+                            </div>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-gray-600">{{ $booking->property->name }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $booking->start_date->format('d M Y') }}</td>

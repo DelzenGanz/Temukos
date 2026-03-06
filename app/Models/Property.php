@@ -12,6 +12,7 @@ class Property extends Model
         'name',
         'city',
         'address',
+        'phone',
         'price_month',
         'description',
         'property_type',
